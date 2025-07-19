@@ -15,7 +15,7 @@ fn read_process_status(pid: &str) -> Option<Process> {
     let path = format!("/proc/{}/status", pid);
     match fs::read_to_string(&path) {
         Ok(content) => {
-            let pid = pid.parse::<u32>().unwrap_or(0); // 安全解析 pid
+            let pid = pid.parse::<u32>().unwrap_or(0); 
             let mut ppid = 0;
             let mut path = String::new();
             let mut status = String::new();

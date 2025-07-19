@@ -1,3 +1,6 @@
+use core::panic;
+use std::vec;
+
 // 支持的输出字段
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub enum PsOutputField {
@@ -30,10 +33,10 @@ impl Default for PsOptions {
         PsOptions {
             processes: Vec::new(),
             fields: vec![
-                PsOutputField::Tty,
                 PsOutputField::Pid,
-                PsOutputField::Path,
+                PsOutputField::Tty,
                 PsOutputField::Time,
+                PsOutputField::Path,
             ],
         }
     }
@@ -46,10 +49,11 @@ pub fn parse_ps_options(args: &[String], pid: u32) -> PsOptions {
     let mut i = 1;
     while i < args.len() {
         match args[i].as_str() {
-            "-e" | "-A" => {
+            "-e" | "-A" | "-a" => {
                 opts.processes.push(PsOutputProcess::ALL);
             }
             "-p" => {
+                opts.processes.pop(); // 清除默认进程ID
                 if i + 1 < args.len() {
                     let pids = args[i + 1]
                         .split(',')
@@ -60,6 +64,7 @@ pub fn parse_ps_options(args: &[String], pid: u32) -> PsOptions {
                 }
             }
             "-t" => {
+                opts.processes.pop(); // 清除默认进程ID
                 if i + 1 < args.len() {
                     let ttys = args[i + 1]
                         .split(',')
@@ -88,7 +93,18 @@ pub fn parse_ps_options(args: &[String], pid: u32) -> PsOptions {
                     i += 1;
                 }
             }
-            _ => {}
+            "-l" => {
+                opts.fields = vec![
+                    PsOutputField::Pid,
+                    PsOutputField::Tty,
+                    PsOutputField::PPid,
+                    PsOutputField::Stat,
+                    PsOutputField::Time,
+                    PsOutputField::Memory,
+                    PsOutputField::Path,
+                ];
+            }
+            _ => {panic!("Unsupported option: {}", args[i]);}
         }
         i += 1;
     }
