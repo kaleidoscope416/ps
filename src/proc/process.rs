@@ -32,11 +32,4 @@ impl Process {
             memory,
         }
     }
-
-    pub fn display_with_no_para(&self) {
-        println!(
-            "{:<16} {:<16} {:<16} {}",
-            self.pid, self.tty, self.time, self.path
-        );
-    }
 }
